@@ -19,4 +19,20 @@ class Tool{
         $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
         return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
     }
+
+    public static function whileTry($closure,$arg){
+        $check_file_try = 1;
+        while (true){
+            try{
+                $closure($arg);
+                break;
+            }catch (\Exception $exception){
+                sleep(1);
+                $check_file_try++;
+                if(30<$check_file_try){
+                    break;
+                }
+            }
+        }
+    }
 }

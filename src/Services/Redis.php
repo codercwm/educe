@@ -2,9 +2,9 @@
 
 namespace Codercwm\Educe\Services;
 
-use Codercwm\Educe\Concerns\Cache;
+use Codercwm\Educe\Concerns\Database;
 
-class Redis implements Cache {
+class Redis implements Database {
 
     private $redis;
 
@@ -22,7 +22,7 @@ class Redis implements Cache {
         return self::$instance;
     }
 
-    public function setnx($key,$value){
+    public function setnx($key,$value):bool{
         return $this->redis->setnx($key,$value);
     }
 
@@ -38,4 +38,7 @@ class Redis implements Cache {
         return $this->redis->incrby($key,$value);
     }
 
+    public function del($key){
+        return $this->redis->del($key);
+    }
 }

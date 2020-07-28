@@ -1,0 +1,21 @@
+{
+    "name": "codercwm/educe",
+    "require": {
+        "php": ">=7.0.0",
+        "box/spout": "^3.1.0"
+    },
+    "authors": [
+        {
+            "name": "codercwm",
+            "email": "987950059@qq.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Codercwm\\Educe\\": "src/"
+        }
+    },
+    "extra": {
+
+    }
+}
