@@ -22,12 +22,6 @@ abstract class Educe extends Service{
     public $suffixType = null;
 
     /**
-     * 设置有效期
-     * @var int
-     */
-    public $expire = 86400;
-
-    /**
      * 存放任务信息
      * @var array
      */
@@ -70,7 +64,7 @@ abstract class Educe extends Service{
                     $item['completed_at'] = $this->cacheService()->get($item['task_id'].'_completed_at');
                     //计算导出进度
                     if(false==$item['completed_at']){
-                        $percent = bcmul(($item['progress_read']+$item['progress_write']+$item['progress_merge']) / ($item['count']+$item['count']+$item['count']),100,0);
+                        $percent = bcmul(($item['progress_read']+$item['progress_write']+$item['progress_merge']) / ($item['count']?($item['count']*3):1),100,0);
                         if($percent>99) $percent = 99;
                     }else{
                         $percent = 100;
@@ -122,12 +116,12 @@ abstract class Educe extends Service{
 
     public function delDir($task_id=null){
         if(is_null($task_id)){
-            $files_dir = $this->taskInfo['files_dir'];
+            $task_info = $this->taskInfo;
         }else{
             $task_info = $this->select($task_id,[]);
-            $files_dir = $task_info['files_dir'];
         }
 
+        $files_dir = $task_info['files_dir'];
         if(is_dir($files_dir)){
             $handler_del = opendir($files_dir);
             while (($file = readdir($handler_del)) !== false) {
@@ -141,6 +135,12 @@ abstract class Educe extends Service{
             }
             @closedir($files_dir);
             @rmdir($files_dir);
+        }
+
+        $path = $task_info['path_info']['dirname'].DIRECTORY_SEPARATOR.$task_info['path_info']['basename'];
+        if(is_file($path)){
+            @unlink($path);
+
         }
     }
 
