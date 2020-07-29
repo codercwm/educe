@@ -82,6 +82,7 @@ class Store{
                 //走到了这一步，就说明已经完成了合并
                 $educe->cacheService()->set($educe->taskInfo['task_id'].'_progress_merge',$educe->taskInfo['count']);
                 $educe->cacheService()->setnx($educe->taskInfo['task_id'].'_completed_at',date('YmdHis'));
+                $educe->onComplete();
             }
         }
     }

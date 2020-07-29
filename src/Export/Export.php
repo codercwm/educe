@@ -4,7 +4,6 @@ namespace Codercwm\Educe\Export;
 
 use Codercwm\Educe\Concerns\Educe;
 use Box\Spout\Common\Type as SpoutType;
-use Codercwm\Educe\Exception;
 
 class Export{
 
@@ -60,7 +59,7 @@ class Export{
             if(method_exists($this->educe,'queue')){
                 //放入队列时把query设成空，队列执行获取数据时会再重新赋值，因为某些情况query是不能被序列化的
                 $this->educe->query = null;
-                $this->educe->queue($this->educe);
+                $this->educe->queue();
             }else{
                 $this->educe->export();
             }
@@ -69,11 +68,16 @@ class Export{
     }
 
     private function verify(){
-        
+        $all_task = $this->educe->select();
+        foreach ($all_task as $task_info){
+            if( $task_info['is_normal'] and (100!=$task_info['percent']) ) {
+                throw new \Exception('请等待当前任务完成');
+            }
+        }
     }
 
 
-    private function methodValue($method_name){
+    private function methodCall($method_name){
         if(method_exists($this->educe,$method_name)){
             return $this->educe->{$method_name}();
         }
@@ -95,17 +99,17 @@ class Export{
         if(!is_dir($files_dir)){
             $mkdir = mkdir($files_dir,0777,true);
             if(!$mkdir){
-                throw new Exception('文件夹创建失败');
+                throw new \Exception('文件夹创建失败');
             }
         }
 
         $this->educe->taskInfo['files_dir'] = $files_dir;
 
         //excel表头
-        $this->educe->taskInfo['headers'] = $this->methodValue('headers');
+        $this->educe->taskInfo['headers'] = $this->methodCall('headers');
 
         //字段名
-        $this->educe->taskInfo['fields'] = $this->methodValue('fields');
+        $this->educe->taskInfo['fields'] = $this->methodCall('fields');
 
         //每次条数，是从take方法中获取参数值
         $batch_size = null;
@@ -116,7 +120,7 @@ class Export{
         $this->educe->taskInfo['batch_size'] = $batch_size;
 
         //调用count方法获取总条数
-        $count = $this->methodValue('count');
+        $count = $this->methodCall('count');
         $this->educe->taskInfo['count'] = $count;
 
         //总共分了多少批
@@ -139,7 +143,7 @@ class Export{
         $this->educe->taskInfo['created_at'] = date('YmdHis');
 
         //调用任务保存方法把任务保存
-        $this->educe->save();
+        $this->educe->save($this->educe->taskInfo);
 
         $this->educe->cacheService()->set($this->educe->taskInfo['task_id'].'_is_normal',1);
 

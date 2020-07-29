@@ -15,7 +15,7 @@ class Log{
             }
         }
 
-        $str = '['.date('Y-m-d H:i:s').'] '.$str.PHP_EOL;
+        $str = '['.(new \DateTime)->format('Y-m-d H:i:s.u').'] '.$str.PHP_EOL;
 
         $log = $path_info['dirname'].DIRECTORY_SEPARATOR.$path_info['filename'].'.log';
 
