@@ -82,7 +82,7 @@ abstract class Educe extends Service{
         return [];
     }
 
-    public function delTask($task_id){
+    public function delete($task_id){
         $key = md5('EduceExport_'.get_called_class());
         $all_task_id = Tool::deJson($this->cacheService()->get($key));
         if(!empty($all_task_id)){
