@@ -28,11 +28,6 @@ class Export{
 
         $this->pathInfo = pathinfo($this->educe->path);
 
-        //确定文件类型
-        if(is_null($this->educe->suffixType)){
-            $this->educe->suffixType = $this->pathInfo['extension'];
-        }
-
         //生成任务id
         $this->educe->taskInfo['task_id'] = 'EduceExport'.uniqid();
 

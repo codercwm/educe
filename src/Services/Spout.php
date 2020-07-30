@@ -17,8 +17,6 @@ class Spout implements Sheet {
     }
 
     public function before() {
-        //确定文件类型
-        $this->writer = WriterEntityFactory::createWriter($this->educe->suffixType);
 
         //这个是导出的文件存放文件夹
         $dir = $this->educe->taskInfo['files_dir'];
@@ -27,6 +25,9 @@ class Spout implements Sheet {
         $filename = $this->educe->currentBatch;
         //文件后缀，获取pathinfo的文件后缀
         $extension = $this->educe->taskInfo['path_info']['extension'];
+
+        //确定文件类型
+        $this->writer = WriterEntityFactory::createWriter($extension);
 
         //打开文件
         Tool::whileTry(function($arg){
@@ -59,7 +60,7 @@ class Spout implements Sheet {
 
         //把文件中的数据全部读取出来放到一个新文件，spout组件使用此方式内存占用较少
 
-        $writer = WriterEntityFactory::createWriter($this->educe->suffixType);
+        $writer = WriterEntityFactory::createWriter($path_info['extension']);
         $writer->openToFile($write_file);
 
         //写入表头

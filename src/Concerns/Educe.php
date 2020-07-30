@@ -16,12 +16,6 @@ abstract class Educe extends Service{
     public $path = null;
 
     /**
-     * 设置文件类型，如果不设置则获取文件后缀
-     * @var null
-     */
-    public $suffixType = null;
-
-    /**
      * 存放任务信息
      * @var array
      */
@@ -94,10 +88,7 @@ abstract class Educe extends Service{
         if(!empty($all_task_id)){
             $found_key = array_search($task_id,$all_task_id);
             if(false!==$found_key){
-                //首先把文件夹删除
-                $this->delDir($task_id);
-
-                //再把任务信息删除
+                //把任务信息删除
                 $this->cacheService()->del($task_id);
                 unset($all_task_id[$found_key]);
                 $this->cacheService()->del($task_id.'_progress_read');
@@ -114,19 +105,14 @@ abstract class Educe extends Service{
 
     }
 
-    public function delDir($task_id=null){
-        if(is_null($task_id)){
-            $task_info = $this->taskInfo;
-        }else{
-            $task_info = $this->select($task_id,[]);
-        }
+    public function delDir($path_info){
 
-        $files_dir = $task_info['files_dir'];
+        $files_dir = $path_info['dirname'].DIRECTORY_SEPARATOR.$path_info['filename'];
         if(is_dir($files_dir)){
             $handler_del = opendir($files_dir);
             while (($file = readdir($handler_del)) !== false) {
                 if ($file != "." && $file != "..") {
-                    $del_file = $files_dir . "/" . $file;
+                    $del_file = $files_dir . DIRECTORY_SEPARATOR . $file;
                     if(is_file($del_file)){
                         //删除文件
                         @unlink($del_file);
@@ -137,7 +123,7 @@ abstract class Educe extends Service{
             @rmdir($files_dir);
         }
 
-        $path = $task_info['path_info']['dirname'].DIRECTORY_SEPARATOR.$task_info['path_info']['basename'];
+        $path = $path_info['dirname'].DIRECTORY_SEPARATOR.$path_info['basename'];
         if(is_file($path)){
             @unlink($path);
 
