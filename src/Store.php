@@ -32,6 +32,11 @@ class Store{
 
         $resource = $educe->resource();
 
+        $resource_count = count($resource);
+
+        //记录数据读取进度，表示已经从数据库里获取了多少条数据
+        $educe->cacheService()->incrby($educe->taskInfo['task_id'].'_progress_read',$resource_count);
+
         //实例化文件写入服务
         $sheet_service_name = $educe->sheetService();
         $sheet_service = new $sheet_service_name($educe);
@@ -45,8 +50,6 @@ class Store{
         }
 
         foreach ($resource as $datum){
-            //记录数据读取进度，表示已经从数据库里获取了多少条数据
-            $educe->cacheService()->incrby($educe->taskInfo['task_id'].'_progress_read',1);
             if(isset($field_value)){
                 //进行返回值处理和获取
                 $datum = $field_value->get($datum);
@@ -59,7 +62,7 @@ class Store{
         $sheet_service->after();
 
         //记录数据写入进度，表示已经写了多少条数据到文件里
-        $educe->cacheService()->incrby($educe->taskInfo['task_id'].'_progress_write',count($resource));
+        $educe->cacheService()->incrby($educe->taskInfo['task_id'].'_progress_write',$resource_count);
 
         $resource = null;
 
